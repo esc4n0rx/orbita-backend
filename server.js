@@ -5,6 +5,7 @@ const helmet = require('helmet');
 require('dotenv').config();
 
 const usuarioRoutes = require('./routes/usuarioRoutes');
+const tarefaRoutes = require('./routes/tarefaRoutes');
 const { swaggerUi, swaggerDocs } = require('./docs/swagger');
 
 const app = express();
@@ -21,6 +22,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Rotas
 app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/tarefas', tarefaRoutes);
 
 // Rota padrão
 app.get('/', (req, res) => {

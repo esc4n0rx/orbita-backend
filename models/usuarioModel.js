@@ -47,6 +47,47 @@ class UsuarioModel {
 
     return data[0];
   }
+  static async atualizarPontosESequencia(id, pontos, sequencia) {
+    const { data, error } = await supabase
+      .from(this.TABELA)
+      .update({
+        pontos_xp: pontos,
+        sequencia: sequencia
+      })
+      .eq('id', id)
+      .select('id, nome, email, nivel, pontos_xp, sequencia, criado_em');
+
+    if (error) {
+      console.error('Erro ao atualizar pontos e sequência:', error);
+      throw new Error(error.message);
+    }
+
+    return data[0];
+  }
+
+  static async atualizarNivel(id, novoNivel, pontos) {
+    const { data, error } = await supabase
+      .from(this.TABELA)
+      .update({
+        nivel: novoNivel,
+        pontos_xp: pontos
+      })
+      .eq('id', id)
+      .select('id, nome, email, nivel, pontos_xp, sequencia, criado_em');
+
+    if (error) {
+      console.error('Erro ao atualizar nível:', error);
+      throw new Error(error.message);
+    }
+
+    return data[0];
+  }
+  
 }
+
+
+  
+
+  
 
 module.exports = UsuarioModel;
