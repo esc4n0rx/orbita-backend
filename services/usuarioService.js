@@ -1,5 +1,5 @@
 // Serviço de usuário 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UsuarioModel = require('../models/usuarioModel');
 require('dotenv').config();
