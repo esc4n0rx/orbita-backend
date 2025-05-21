@@ -2,52 +2,101 @@
 const TarefaModel = require('../models/tarefaModel');
 const UsuarioModel = require('../models/usuarioModel');
 const NivelModel = require('../models/nivelModel');
+const CategoriaModel = require('../models/categoriaModel');
+const TagModel = require('../models/tagModel');
 
 class TarefaService {
-  static async criarTarefa(usuarioId, dadosTarefa) {
-    // Garantir que os pontos não excedam 20
+    static async criarTarefa(usuarioId, dadosTarefa) {
     if (dadosTarefa.pontos > 20) {
-      dadosTarefa.pontos = 20;
+        dadosTarefa.pontos = 20;
     }
-    
-    // Preparar dados da tarefa
+
     const tarefa = {
-      usuario_id: usuarioId,
-      nome: dadosTarefa.nome,
-      descricao: dadosTarefa.descricao,
-      data_vencimento: dadosTarefa.data_vencimento,
-      hora_vencimento: dadosTarefa.hora_vencimento || null,
-      pontos: dadosTarefa.pontos,
-      concluida: false,
-      vencida: false,
-      data_criacao: new Date().toISOString(),
-      data_conclusao: null
+        usuario_id: usuarioId,
+        nome: dadosTarefa.nome,
+        descricao: dadosTarefa.descricao,
+        data_vencimento: dadosTarefa.data_vencimento,
+        hora_vencimento: dadosTarefa.hora_vencimento || null,
+        pontos: dadosTarefa.pontos,
+        concluida: false,
+        vencida: false,
+        data_criacao: new Date().toISOString(),
+        data_conclusao: null
     };
 
-    return await TarefaModel.criarTarefa(tarefa);
-  }
+    // Criar a tarefa
+    const tarefaCriada = await TarefaModel.criarTarefa(tarefa);
+    
+    // Associar categorias se fornecidas
+    if (dadosTarefa.categorias && Array.isArray(dadosTarefa.categorias) && dadosTarefa.categorias.length > 0) {
+        for (const categoriaId of dadosTarefa.categorias) {
+        await CategoriaModel.associarCategoriaTarefa(tarefaCriada.id, categoriaId);
+        }
+    }
+    
+    // Associar tags se fornecidas
+    if (dadosTarefa.tags && Array.isArray(dadosTarefa.tags) && dadosTarefa.tags.length > 0) {
+        for (const tagId of dadosTarefa.tags) {
+        await TagModel.associarTagTarefa(tarefaCriada.id, tagId);
+        }
+    }
 
-  static async listarTarefas(usuarioId) {
+    // Obter categorias e tags associadas
+    const categorias = await CategoriaModel.listarCategoriasTarefa(tarefaCriada.id);
+    const tags = await TagModel.listarTagsTarefa(tarefaCriada.id);
+    
+    // Retornar tarefa com categorias e tags
+    return {
+        ...tarefaCriada,
+        categorias,
+        tags
+    };
+    }
+
+    static async listarTarefas(usuarioId) {
     // Verificar tarefas vencidas antes de listar
     await this.verificarTarefasVencidas();
     
-    return await TarefaModel.listarTarefasPorUsuario(usuarioId);
-  }
+    const tarefas = await TarefaModel.listarTarefasPorUsuario(usuarioId);
+    
+    // Para cada tarefa, obter suas categorias e tags
+    const tarefasCompletas = await Promise.all(tarefas.map(async (tarefa) => {
+        const categorias = await CategoriaModel.listarCategoriasTarefa(tarefa.id);
+        const tags = await TagModel.listarTagsTarefa(tarefa.id);
+        
+        return {
+        ...tarefa,
+        categorias,
+        tags
+        };
+    }));
+    
+    return tarefasCompletas;
+    }
 
-  static async obterTarefa(id, usuarioId) {
+    static async obterTarefa(id, usuarioId) {
     const tarefa = await TarefaModel.buscarTarefaPorId(id);
     
     if (!tarefa) {
-      throw new Error('Tarefa não encontrada');
+        throw new Error('Tarefa não encontrada');
     }
     
     // Verificar se a tarefa pertence ao usuário
     if (tarefa.usuario_id !== usuarioId) {
-      throw new Error('Acesso não autorizado a esta tarefa');
+        throw new Error('Acesso não autorizado a esta tarefa');
     }
     
-    return tarefa;
-  }
+    // Obter categorias e tags da tarefa
+    const categorias = await CategoriaModel.listarCategoriasTarefa(id);
+    const tags = await TagModel.listarTagsTarefa(id);
+    
+    // Adicionar categorias e tags à tarefa
+    return {
+        ...tarefa,
+        categorias,
+        tags
+    };
+    }
 
   static async atualizarTarefa(id, usuarioId, dadosTarefa) {
     // Verificar se a tarefa existe e pertence ao usuário

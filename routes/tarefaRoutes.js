@@ -282,4 +282,218 @@ router.patch('/:id/concluir', TarefaController.concluir);
  */
 router.delete('/:id', TarefaController.excluir);
 
+/**
+ * @swagger
+ * /api/tarefas/{id}/categorias:
+ *   get:
+ *     summary: Listar categorias de uma tarefa
+ *     tags: [Tarefas, Categorias]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da tarefa
+ *     responses:
+ *       200:
+ *         description: Lista de categorias da tarefa
+ *       401:
+ *         description: Não autorizado
+ *       403:
+ *         description: Acesso não autorizado a esta tarefa
+ *       404:
+ *         description: Tarefa não encontrada
+ *       500:
+ *         description: Erro interno do servidor
+ */
+router.get('/:id/categorias', TarefaController.listarCategorias);
+
+/**
+ * @swagger
+ * /api/tarefas/{id}/categorias:
+ *   post:
+ *     summary: Adicionar categoria a uma tarefa
+ *     tags: [Tarefas, Categorias]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da tarefa
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - categoria_id
+ *             properties:
+ *               categoria_id:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Categoria adicionada à tarefa com sucesso
+ *       400:
+ *         description: Dados inválidos
+ *       401:
+ *         description: Não autorizado
+ *       403:
+ *         description: Acesso não autorizado a esta tarefa
+ *       404:
+ *         description: Tarefa não encontrada
+ *       500:
+ *         description: Erro interno do servidor
+ */
+router.post('/:id/categorias', TarefaController.adicionarCategoria);
+
+/**
+ * @swagger
+ * /api/tarefas/{tarefaId}/categorias/{categoriaId}:
+ *   delete:
+ *     summary: Remover categoria de uma tarefa
+ *     tags: [Tarefas, Categorias]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: tarefaId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da tarefa
+ *       - in: path
+ *         name: categoriaId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da categoria
+ *     responses:
+ *       200:
+ *         description: Categoria removida da tarefa com sucesso
+ *       401:
+ *         description: Não autorizado
+ *       403:
+ *         description: Acesso não autorizado a esta tarefa
+ *       404:
+ *         description: Tarefa não encontrada
+ *       500:
+ *         description: Erro interno do servidor
+ */
+router.delete('/:tarefaId/categorias/:categoriaId', TarefaController.removerCategoria);
+
+/**
+ * @swagger
+ * /api/tarefas/{id}/tags:
+ *   get:
+ *     summary: Listar tags de uma tarefa
+ *     tags: [Tarefas, Tags]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da tarefa
+ *     responses:
+ *       200:
+ *         description: Lista de tags da tarefa
+ *       401:
+ *         description: Não autorizado
+ *       403:
+ *         description: Acesso não autorizado a esta tarefa
+ *       404:
+ *         description: Tarefa não encontrada
+ *       500:
+ *         description: Erro interno do servidor
+ */
+router.get('/:id/tags', TarefaController.listarTags);
+
+/**
+ * @swagger
+ * /api/tarefas/{id}/tags:
+ *   post:
+ *     summary: Adicionar tag a uma tarefa
+ *     tags: [Tarefas, Tags]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da tarefa
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - tag_id
+ *             properties:
+ *               tag_id:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Tag adicionada à tarefa com sucesso
+ *       400:
+ *         description: Dados inválidos
+ *       401:
+ *         description: Não autorizado
+ *       403:
+ *         description: Acesso não autorizado a esta tarefa
+ *       404:
+ *         description: Tarefa não encontrada
+ *       500:
+ *         description: Erro interno do servidor
+ */
+router.post('/:id/tags', TarefaController.adicionarTag);
+
+/**
+ * @swagger
+ * /api/tarefas/{tarefaId}/tags/{tagId}:
+ *   delete:
+ *     summary: Remover tag de uma tarefa
+ *     tags: [Tarefas, Tags]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: tarefaId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da tarefa
+ *       - in: path
+ *         name: tagId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da tag
+ *     responses:
+ *       200:
+ *         description: Tag removida da tarefa com sucesso
+ *       401:
+ *         description: Não autorizado
+ *       403:
+ *         description: Acesso não autorizado a esta tarefa
+ *       404:
+ *         description: Tarefa não encontrada
+ *       500:
+ *         description: Erro interno do servidor
+ */
+router.delete('/:tarefaId/tags/:tagId', TarefaController.removerTag);
+
+
+
 module.exports = router;
