@@ -1,4 +1,4 @@
-// Documentação Swagger 
+// docs/swagger.js
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
@@ -6,9 +6,9 @@ const swaggerOptions = {
   swaggerDefinition: {
     openapi: '3.0.0',
     info: {
-      title: 'API de Tarefas',
+      title: 'BACKEND - API Routina',
       version: '1.0.0',
-      description: 'API para sistema de tarefas com autenticação',
+      description: 'API para sistema de tarefas Routina',
     },
     servers: [
       {
@@ -26,7 +26,8 @@ const swaggerOptions = {
       },
     },
   },
-  apis: ['./src/routes/*.js'],
+  // O problema provavelmente está aqui - se os arquivos de rotas estiverem em outro local, o Swagger não encontrará as definições
+  apis: ['./routes/*.js'], // Verifique se esse caminho está correto
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
