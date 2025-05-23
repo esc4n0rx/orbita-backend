@@ -23,6 +23,7 @@ class NotificationModel {
         mensagem: notification.mensagem,
         prioridade: notification.prioridade || 5,
         agendado_para: notification.agendado_para,
+        status: notification.status || 'PENDING',
         metadata: notification.metadata || {}
       }])
       .select('*');
@@ -36,11 +37,11 @@ class NotificationModel {
   }
 
   /**
-   * Lista notificações pendentes para envio
+   * Lista notificações pendentes para envio (NOVO MÉTODO)
    * @param {number} limit - Limite de notificações
    * @returns {Promise<Array>} - Lista de notificações
    */
-  static async listarPendentes(limit = 50) {
+  static async listarPendentesParaEnvio(limit = 50) {
     const { data, error } = await supabase
       .from(this.TABELA)
       .select(`
@@ -59,11 +60,20 @@ class NotificationModel {
       .limit(limit);
 
     if (error) {
-      console.error('Erro ao listar notificações pendentes:', error);
+      console.error('Erro ao listar notificações pendentes para envio:', error);
       throw new Error(error.message);
     }
 
     return data;
+  }
+
+  /**
+   * Lista notificações pendentes para envio (método original mantido para compatibilidade)
+   * @param {number} limit - Limite de notificações
+   * @returns {Promise<Array>} - Lista de notificações
+   */
+  static async listarPendentes(limit = 50) {
+    return this.listarPendentesParaEnvio(limit);
   }
 
   /**
@@ -103,6 +113,32 @@ class NotificationModel {
   }
 
   /**
+   * Lista notificações recentes por usuário e tipo (NOVO MÉTODO)
+   * @param {string} usuarioId - ID do usuário
+   * @param {string} tipo - Tipo da notificação
+   * @param {string} dataMinima - Data mínima em ISO string
+   * @param {number} limit - Limite de resultados
+   * @returns {Promise<Array>} - Lista de notificações
+   */
+  static async listarRecentesPorUsuarioETipo(usuarioId, tipo, dataMinima, limit = 10) {
+    const { data, error } = await supabase
+      .from(this.TABELA)
+      .select('*')
+      .eq('usuario_id', usuarioId)
+      .eq('tipo', tipo)
+      .gte('criado_em', dataMinima)
+      .order('criado_em', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('Erro ao listar notificações recentes:', error);
+      throw new Error(error.message);
+    }
+
+    return data || [];
+  }
+
+  /**
    * Atualiza status da notificação
    * @param {string} id - ID da notificação
    * @param {string} status - Novo status
@@ -114,7 +150,7 @@ class NotificationModel {
     
     if (status === 'SENT') {
       updates.enviado_em = new Date().toISOString();
-    } else if (status === 'READ') {
+    } else if (status === 'read') {
       updates.lido_em = new Date().toISOString();
     }
 
@@ -306,7 +342,7 @@ class NotificationModel {
    * @param {string} usuarioId - ID do usuário
    * @returns {Promise<number>} - Quantidade de notificações
    */
-  static async contarNotificaciesHoje(usuarioId) {
+  static async contarNotificacoesHoje(usuarioId) {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
     const amanha = new Date(hoje);
@@ -341,7 +377,7 @@ class NotificationModel {
       .from(this.TABELA)
       .delete()
       .lt('criado_em', dataLimite.toISOString())
-      .in('status', ['SENT', 'READ', 'DISMISSED']);
+      .in('status', ['SENT', 'read', 'DISMISSED']);
 
     if (error) {
       console.error('Erro ao limpar notificações antigas:', error);

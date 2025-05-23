@@ -3,16 +3,24 @@ class TaskContextProcessor {
   /**
    * Processa e enriquece o contexto da tarefa
    * @param {string} tarefaId - ID da tarefa
+   * @param {string} usuarioId - ID do usuário (opcional, para validação)
    * @returns {Promise<Object>} - Contexto processado da tarefa
    */
-  async process(tarefaId) {
+  async process(tarefaId, usuarioId = null) {
     try {
       const TarefaModel = require('../../models/tarefaModel');
       
       // Buscar dados básicos da tarefa
       const tarefa = await TarefaModel.buscarTarefaPorId(tarefaId);
       if (!tarefa) {
-        throw new Error('Tarefa não encontrada');
+        console.warn(`Tarefa ${tarefaId} não encontrada`);
+        return null;
+      }
+
+      // Verificar se pertence ao usuário (se usuarioId fornecido)
+      if (usuarioId && tarefa.usuario_id !== usuarioId) {
+        console.warn(`Tarefa ${tarefaId} não pertence ao usuário ${usuarioId}`);
+        return null;
       }
 
       // Enriquecer com contexto adicional
@@ -315,4 +323,4 @@ class TaskContextProcessor {
   }
 }
 
-module.exports = {TaskContextProcessor };
+module.exports = TaskContextProcessor;

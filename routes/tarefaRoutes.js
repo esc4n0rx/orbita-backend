@@ -221,25 +221,6 @@ router.patch('/:id/adiar', TarefaController.adiar);
  *     responses:
  *       200:
  *         description: Tarefa concluída com sucesso
- * 
-/**
- * @swagger
- * /api/tarefas/{id}/concluir:
- *   patch:
- *     summary: Concluir tarefa
- *     tags: [Tarefas]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID da tarefa
- *     responses:
- *       200:
- *         description: Tarefa concluída com sucesso
  *       400:
  *         description: Tarefa já foi concluída
  *       401:
@@ -493,7 +474,5 @@ router.post('/:id/tags', TarefaController.adicionarTag);
  *         description: Erro interno do servidor
  */
 router.delete('/:tarefaId/tags/:tagId', TarefaController.removerTag);
-
-
 
 module.exports = router;
