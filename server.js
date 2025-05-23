@@ -9,6 +9,7 @@ const tarefaRoutes = require('./routes/tarefaRoutes');
 const categoriaRoutes = require('./routes/categoriaRoutes');
 const tagRoutes = require('./routes/tagRoutes');
 const neurolinkRoutes = require('./routes/neurolinkRoutes');
+const pushNotificationRoutes = require('./routes/pushNotificationRoutes');
 const NotificationScheduler = require('./neurolink/scheduler/NotificationScheduler');
 const { swaggerUi, swaggerDocs } = require('./docs/swagger');
 
@@ -30,6 +31,7 @@ app.use('/api/tarefas', tarefaRoutes);
 app.use('/api/categorias', categoriaRoutes);
 app.use('/api/tags', tagRoutes);
 app.use('/api/neurolink', neurolinkRoutes);
+app.use('/api/push', pushNotificationRoutes);
 
 
 

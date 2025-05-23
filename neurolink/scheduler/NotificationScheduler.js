@@ -20,6 +20,16 @@ class NotificationScheduler {
 
     console.log('🚀 Iniciando NeuroLink Scheduler...');
 
+    this.jobs.set('cleanupPushSubscriptions', cron.schedule('0 3 * * 0', async () => {
+    try {
+      const PushSubscriptionModel = require('../models/pushSubscriptionModel');
+      await PushSubscriptionModel.limparSubscriptionsAntigas(90);
+      console.log('🧹 Limpeza de push subscriptions antigas concluída');
+    } catch (error) {
+      console.error('Erro na limpeza de push subscriptions:', error);
+    }
+  }));
+
     // Processar fila a cada 2 minutos
     this.jobs.set('processQueue', cron.schedule('*/2 * * * *', async () => {
       try {
