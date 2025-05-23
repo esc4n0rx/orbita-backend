@@ -56,3 +56,7 @@ temp/
 
 # Yarn Integrity file
 .yarn-integrity
+
+neurolink-test-cli.js
+/neurolink-test-cli.js
+neurolink-test-cli.js/

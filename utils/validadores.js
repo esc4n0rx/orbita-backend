@@ -46,6 +46,36 @@ const associarTagSchema = z.object({
   tag_id: z.string().uuid('ID da tag deve ser um UUID válido')
 });
 
+const neurolinkValidators = {
+  gerarNotificacao: z.object({
+    tarefa_id: z.string().uuid('ID da tarefa deve ser um UUID válido').optional(),
+    tipo: z.enum(['ALERT', 'REMINDER', 'INSIGHT', 'MOTIVATION', 'PROGRESS', 'ACHIEVEMENT'], {
+      required_error: 'Tipo de notificação é obrigatório',
+      invalid_type_error: 'Tipo de notificação inválido'
+    }),
+    objetivo: z.string().min(10, 'Objetivo deve ter pelo menos 10 caracteres').optional()
+  }),
+
+  feedback: z.object({
+    feedback_tipo: z.enum(['helpful', 'annoying', 'irrelevant', 'perfect', 'too_early', 'too_late'], {
+      required_error: 'Tipo de feedback é obrigatório',
+      invalid_type_error: 'Tipo de feedback inválido'
+    }),
+    comentario: z.string().max(500, 'Comentário não pode exceder 500 caracteres').optional()
+  }),
+
+  configuracoes: z.object({
+    personalidade: z.enum(['formal', 'casual', 'motivational', 'friendly']).optional(),
+    horario_inicio: z.string().regex(/^\d{2}:\d{2}$/, 'Horário deve estar no formato HH:MM').optional(),
+    horario_fim: z.string().regex(/^\d{2}:\d{2}$/, 'Horário deve estar no formato HH:MM').optional(),
+    frequencia_maxima: z.number().int().min(1).max(20, 'Frequência máxima deve estar entre 1 e 20').optional(),
+    tipos_habilitados: z.array(z.enum(['ALERT', 'REMINDER', 'INSIGHT', 'MOTIVATION', 'PROGRESS', 'ACHIEVEMENT'])).optional(),
+    timezone: z.string().min(1, 'Timezone é obrigatório').optional()
+  })
+};
+
+
+
 module.exports = {
   registroSchema,
   loginSchema,
@@ -54,5 +84,6 @@ module.exports = {
   categoriaSchema,
   tagSchema,
   associarCategoriaSchema,
-  associarTagSchema
+  associarTagSchema,
+  neurolinkValidators
 };

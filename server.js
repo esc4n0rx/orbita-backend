@@ -8,6 +8,8 @@ const usuarioRoutes = require('./routes/usuarioRoutes');
 const tarefaRoutes = require('./routes/tarefaRoutes');
 const categoriaRoutes = require('./routes/categoriaRoutes');
 const tagRoutes = require('./routes/tagRoutes');
+const neurolinkRoutes = require('./routes/neurolinkRoutes');
+const NotificationScheduler = require('./neurolink/scheduler/NotificationScheduler');
 const { swaggerUi, swaggerDocs } = require('./docs/swagger');
 
 const app = express();
@@ -27,6 +29,26 @@ app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/tarefas', tarefaRoutes);
 app.use('/api/categorias', categoriaRoutes);
 app.use('/api/tags', tagRoutes);
+app.use('/api/neurolink', neurolinkRoutes);
+
+
+
+const scheduler = new NotificationScheduler();
+scheduler.start();
+
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM recebido, parando scheduler...');
+  scheduler.stop();
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT recebido, parando scheduler...');
+  scheduler.stop();
+  process.exit(0);
+});
 
 // Rota padrão
 app.get('/', (req, res) => {
