@@ -37,7 +37,7 @@ class NotificationModel {
   }
 
   /**
-   * Lista notificações pendentes para envio (NOVO MÉTODO)
+   * Lista notificações pendentes para envio
    * @param {number} limit - Limite de notificações
    * @returns {Promise<Array>} - Lista de notificações
    */
@@ -113,7 +113,7 @@ class NotificationModel {
   }
 
   /**
-   * Lista notificações recentes por usuário e tipo (NOVO MÉTODO)
+   * Lista notificações recentes por usuário e tipo
    * @param {string} usuarioId - ID do usuário
    * @param {string} tipo - Tipo da notificação
    * @param {string} dataMinima - Data mínima em ISO string
@@ -146,13 +146,24 @@ class NotificationModel {
    * @returns {Promise<Object>} - Notificação atualizada
    */
   static async atualizarStatus(id, status, extras = {}) {
-    const updates = { status, ...extras };
+    const updates = { status };
     
+    // Adicionar timestamps baseados no status
     if (status === 'SENT') {
       updates.enviado_em = new Date().toISOString();
     } else if (status === 'read') {
       updates.lido_em = new Date().toISOString();
     }
+
+    // Processar campos extras de forma segura
+    Object.keys(extras).forEach(key => {
+      // Verificar se é um campo válido antes de adicionar
+      if (this._isValidUpdateField(key)) {
+        updates[key] = extras[key];
+      } else {
+        console.warn(`Campo ignorado na atualização: ${key}`);
+      }
+    });
 
     const { data, error } = await supabase
       .from(this.TABELA)
@@ -166,6 +177,24 @@ class NotificationModel {
     }
 
     return data[0];
+  }
+
+  /**
+   * Verifica se um campo é válido para atualização
+   * @param {string} fieldName - Nome do campo
+   * @returns {boolean} - Se o campo é válido
+   */
+  static _isValidUpdateField(fieldName) {
+    const validFields = [
+      'status',
+      'enviado_em',
+      'lido_em',
+      'metadata',
+      'agendado_para',
+      'push_service_response'
+    ];
+    
+    return validFields.includes(fieldName);
   }
 
   /**

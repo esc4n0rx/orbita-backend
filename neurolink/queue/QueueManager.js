@@ -94,7 +94,7 @@ class QueueManager {
    * Processa a fila de notificações
    * @returns {Promise<Array>} - Notificações processadas
    */
-  async processQueue() {
+   async processQueue() {
     if (this.isProcessing) {
       console.log('Fila já está sendo processada. Tentativa ignorada.');
       return [];
@@ -104,7 +104,6 @@ class QueueManager {
     console.log('Iniciando processamento da fila...');
 
     try {
-      // Buscar notificações pendentes e prontas para envio (agendado_para <= agora)
       const pendingNotifications = await NotificationModel.listarPendentesParaEnvio(this.batchSize);
 
       if (pendingNotifications.length === 0) {
@@ -118,7 +117,7 @@ class QueueManager {
 
       for (const notification of pendingNotifications) {
         try {
-          // Verificar se ainda está no horário permitido do usuário (última checagem)
+          // Verificar se ainda está no horário permitido do usuário
           const isAllowedTime = await this._isWithinAllowedHours(notification.usuario_id);
 
           if (!isAllowedTime) {
@@ -127,9 +126,7 @@ class QueueManager {
             continue;
           }
 
-          // Marcar como enviando para evitar processamento duplicado em execuções paralelas (se houver)
-          // await NotificationModel.atualizarStatus(notification.id, 'SENDING');
-
+          // Enviar push notification
           const pushResult = await this.pushService.enviarParaUsuario(
             notification.usuario_id,
             {
@@ -140,37 +137,35 @@ class QueueManager {
               tarefa_id: notification.tarefa_id,
               prioridade: notification.prioridade,
               url: this._gerarUrlNotificacao(notification)
-              // Adicionar outros dados relevantes para o payload do push, se necessário
             }
           );
 
-          // Marcar como enviada
+          // Marcar como enviada (sem push_service_response por enquanto)
           const sentNotification = await NotificationModel.atualizarStatus(
             notification.id,
             'SENT',
-            { enviado_em: new Date().toISOString(), push_service_response: pushResult }
+            { 
+              enviado_em: new Date().toISOString(),
+              metadata: {
+                ...notification.metadata,
+                push_result: pushResult // Armazenar no metadata por enquanto
+              }
+            }
           );
 
           console.log(`📱 Notificação ${notification.id} enviada para usuário ${notification.usuario_id}. Resultado:`, pushResult);
-          processedNotifications.push({
-            ...sentNotification,
-            // Considerar se 'usuario' e 'tarefa' precisam ser populados aqui
-            // Se NotificationModel já retorna esses dados, não é necessário.
-            // usuario: notification.usuario, // Exemplo, se necessário
-            // tarefa: notification.tarefa    // Exemplo, se necessário
-          });
+          processedNotifications.push(sentNotification);
 
         } catch (error) {
           console.error(`Erro ao processar notificação ${notification.id} para usuário ${notification.usuario_id}:`, error);
 
           const retryCount = (notification.metadata?.retry_count || 0) + 1;
-          let newStatus = 'PENDING'; // Tenta reenviar
-          // Poderia adicionar lógica para mover para 'FAILED' após X tentativas
-          if (retryCount > 5) { // Exemplo: máximo de 5 tentativas
+          let newStatus = 'PENDING';
+          
+          if (retryCount > 5) {
              newStatus = 'FAILED';
              console.warn(`Notificação ${notification.id} excedeu o limite de tentativas. Marcada como FAILED.`);
           }
-
 
           await NotificationModel.atualizarStatus(
             notification.id,
@@ -190,8 +185,7 @@ class QueueManager {
 
     } catch (error) {
       console.error('Erro crítico no processamento da fila:', error);
-      // Não propagar o erro para não parar o worker/job, mas logar criticamente
-      return []; // Retorna array vazio em caso de erro geral no processamento
+      return [];
     } finally {
       this.isProcessing = false;
       console.log('Processamento da fila finalizado.');
