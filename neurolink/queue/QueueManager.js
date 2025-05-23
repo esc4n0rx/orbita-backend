@@ -2,7 +2,7 @@ const NotificationModel = require('../models/notificationModel');
 const PriorityCalculator = require('./PriorityCalculator');
 const AIEngine = require('../core/AIEngine');
 const { UserContextProcessor } = require('../processors/UserContextProcessor');
-const { TaskContextProcessor } = require('../processors/TaskContextProcessor');
+const TaskContextProcessor = require('../processors/TaskContextProcessor');
 const PushNotificationService = require('../services/pushNotificationService');
 
 class QueueManager {
