@@ -218,7 +218,7 @@ NEUROLINK_ENABLED=true
 
 4. Crie as tabelas no Supabase:
    - Execute o SQL do sistema principal (ver seção [Modelos de Dados](#-modelos-de-dados))
-   - **🧠 Execute o SQL do NeuroLink** (4 tabelas adicionais - ver [Documentação do NeuroLink](./docs/NEUROLINK.md))
+   - **🧠 Execute o SQL do NeuroLink** (4 tabelas adicionais - ver [Documentação do NeuroLink](./NEUROLINK.md))
 
 5. Inicie o servidor:
 
@@ -389,7 +389,7 @@ O Routina utiliza as seguintes tabelas no Supabase:
 
 ### SQL para criação das tabelas
 
-> **📋 Nota**: O SQL completo está na [Documentação Detalhada do NeuroLink](./docs/NEUROLINK.md)
+> **📋 Nota**: O SQL completo está na [Documentação Detalhada do NeuroLink](./NEUROLINK.md)
 
 ## 📁 Estrutura de Diretórios
 
@@ -517,7 +517,7 @@ Para informações técnicas completas sobre o NeuroLink, incluindo:
 - Análise de performance
 - Troubleshooting
 
-**[📖 Acesse a Documentação Completa do NeuroLink](./docs/NEUROLINK.md)**
+**[📖 Acesse a Documentação Completa do NeuroLink](./NEUROLINK.md)**
 
 ---
 
